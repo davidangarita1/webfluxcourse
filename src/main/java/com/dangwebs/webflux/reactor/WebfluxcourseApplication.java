@@ -25,7 +25,8 @@ public class WebfluxcourseApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // ejemploItarable();
         // ejemploFlatMap();
-        ejemploToString();
+        // ejemploToString();
+        ejemploCollectList();
     }
 
     public void ejemploItarable() throws Exception {
@@ -112,5 +113,23 @@ public class WebfluxcourseApplication implements CommandLineRunner {
                 })
                 .map(nombre -> nombre.toUpperCase())
                 .subscribe(u -> log.info(u.toString()));
+    }
+
+    public void ejemploCollectList() throws Exception {
+
+        List<Usuario> usuariosList = new ArrayList<>();
+        usuariosList.add(new Usuario("Andres", "Guzman"));
+        usuariosList.add(new Usuario("Pedro", "Fulano"));
+        usuariosList.add(new Usuario("Maria", "Fulana"));
+        usuariosList.add(new Usuario("Diego", "Sultano"));
+        usuariosList.add(new Usuario("Juan", "Mengano"));
+        usuariosList.add(new Usuario("Bruce", "Lee"));
+        usuariosList.add(new Usuario("Bruce", "Willis"));
+
+        Flux.fromIterable(usuariosList)
+                .collectList()
+                .subscribe(lista -> {
+                    lista.forEach(item -> log.info(item.toString()));
+                });
     }
 }
