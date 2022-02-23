@@ -1,6 +1,8 @@
 package com.dangwebs.webflux.reactor;
 
+import com.dangwebs.webflux.reactor.models.Comentarios;
 import com.dangwebs.webflux.reactor.models.Usuario;
+import com.dangwebs.webflux.reactor.models.UsuarioComentarios;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +28,8 @@ public class WebfluxcourseApplication implements CommandLineRunner {
         // ejemploItarable();
         // ejemploFlatMap();
         // ejemploToString();
-        ejemploCollectList();
+        // ejemploCollectList();
+        // ejemploUsuarioComentarioFlatMap();
     }
 
     public void ejemploItarable() throws Exception {
@@ -132,4 +135,20 @@ public class WebfluxcourseApplication implements CommandLineRunner {
                     lista.forEach(item -> log.info(item.toString()));
                 });
     }
+
+    public void ejemploUsuarioComentarioFlatMap() {
+        Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("John", "Doe"));
+
+        Mono<Comentarios> comentariosUsuarioMono = Mono.fromCallable(() -> {
+           Comentarios comentarios = new Comentarios();
+           comentarios.addComentarios("Hola pepe, qué tal!");
+           comentarios.addComentarios("Mañana voy a la playa!");
+           comentarios.addComentarios("Estoy tomando el curso de spring con reactor");
+           return comentarios;
+        });
+
+        usuarioMono.flatMap(u -> comentariosUsuarioMono.map(c -> new UsuarioComentarios(u, c)))
+                .subscribe(uc -> log.info(uc.toString()));
+    }
+
 }
