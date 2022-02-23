@@ -11,9 +11,9 @@ public class UsuarioComentarios {
 
     @Override
     public String toString() {
-        return "UsuarioComentarios{" +
+        return "UsuarioComentarios [" +
                 "usuario=" + usuario +
                 ", comentarios=" + comentarios +
-                '}';
+                ']';
     }
 }

@@ -30,6 +30,8 @@ public class WebfluxcourseApplication implements CommandLineRunner {
         // ejemploToString();
         // ejemploCollectList();
         // ejemploUsuarioComentarioFlatMap();
+        // ejemploUsuarioComentarioZipWith();
+        ejemploUsuarioComentarioZipWithForma2();
     }
 
     public void ejemploItarable() throws Exception {
@@ -86,7 +88,8 @@ public class WebfluxcourseApplication implements CommandLineRunner {
                 .flatMap(usuario -> {
                     if (usuario.getNombre().equalsIgnoreCase("bruce")) {
                         return Mono.just(usuario);
-                    } return Mono.empty();
+                    }
+                    return Mono.empty();
                 })
                 .map(usuario -> {
                     String nombre = usuario.getNombre().toLowerCase();
@@ -112,7 +115,8 @@ public class WebfluxcourseApplication implements CommandLineRunner {
                 .flatMap(nombre -> {
                     if (nombre.contains("bruce".toUpperCase())) {
                         return Mono.just(nombre);
-                    } return Mono.empty();
+                    }
+                    return Mono.empty();
                 })
                 .map(nombre -> nombre.toUpperCase())
                 .subscribe(u -> log.info(u.toString()));
@@ -140,15 +144,55 @@ public class WebfluxcourseApplication implements CommandLineRunner {
         Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("John", "Doe"));
 
         Mono<Comentarios> comentariosUsuarioMono = Mono.fromCallable(() -> {
-           Comentarios comentarios = new Comentarios();
-           comentarios.addComentarios("Hola pepe, qué tal!");
-           comentarios.addComentarios("Mañana voy a la playa!");
-           comentarios.addComentarios("Estoy tomando el curso de spring con reactor");
-           return comentarios;
+            Comentarios comentarios = new Comentarios();
+            comentarios.addComentarios("Hola pepe, qué tal!");
+            comentarios.addComentarios("Mañana voy a la playa!");
+            comentarios.addComentarios("Estoy tomando el curso de spring con reactor");
+            return comentarios;
         });
 
-        usuarioMono.flatMap(u -> comentariosUsuarioMono.map(c -> new UsuarioComentarios(u, c)))
-                .subscribe(uc -> log.info(uc.toString()));
+        Mono<UsuarioComentarios> usuarioConComentarios = usuarioMono
+                .flatMap(u -> comentariosUsuarioMono.map(c -> new UsuarioComentarios(u, c)));
+
+        usuarioConComentarios.subscribe(uc -> log.info(uc.toString()));
     }
 
+    public void ejemploUsuarioComentarioZipWith() {
+        Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("John", "Doe"));
+
+        Mono<Comentarios> comentariosUsuarioMono = Mono.fromCallable(() -> {
+            Comentarios comentarios = new Comentarios();
+            comentarios.addComentarios("Hola pepe, qué tal!");
+            comentarios.addComentarios("Mañana voy a la playa!");
+            comentarios.addComentarios("Estoy tomando el curso de spring con reactor");
+            return comentarios;
+        });
+
+        Mono<UsuarioComentarios> usuarioConComentarios = usuarioMono
+                .zipWith(comentariosUsuarioMono, (usuario, comentariosUsuario) -> new UsuarioComentarios(usuario, comentariosUsuario));
+
+        usuarioConComentarios.subscribe(uc -> log.info(uc.toString()));
+    }
+
+    public void ejemploUsuarioComentarioZipWithForma2() {
+        Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("John", "Doe"));
+
+        Mono<Comentarios> comentariosUsuarioMono = Mono.fromCallable(() -> {
+            Comentarios comentarios = new Comentarios();
+            comentarios.addComentarios("Hola pepe, qué tal!");
+            comentarios.addComentarios("Mañana voy a la playa!");
+            comentarios.addComentarios("Estoy tomando el curso de spring con reactor");
+            return comentarios;
+        });
+
+        Mono<UsuarioComentarios> usuarioConComentarios = usuarioMono
+                .zipWith(comentariosUsuarioMono)
+                .map(tuple -> {
+                    Usuario u = tuple.getT1();
+                    Comentarios c = tuple.getT2();
+                    return new UsuarioComentarios(u, c);
+                });
+
+        usuarioConComentarios.subscribe(uc -> log.info(uc.toString()));
+    }
 }
