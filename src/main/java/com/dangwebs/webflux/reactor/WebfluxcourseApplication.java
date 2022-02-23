@@ -31,7 +31,8 @@ public class WebfluxcourseApplication implements CommandLineRunner {
         // ejemploCollectList();
         // ejemploUsuarioComentarioFlatMap();
         // ejemploUsuarioComentarioZipWith();
-        ejemploUsuarioComentarioZipWithForma2();
+        // ejemploUsuarioComentarioZipWithForma2();
+        ejemploZipWithRangos();
     }
 
     public void ejemploItarable() throws Exception {
@@ -194,5 +195,14 @@ public class WebfluxcourseApplication implements CommandLineRunner {
                 });
 
         usuarioConComentarios.subscribe(uc -> log.info(uc.toString()));
+    }
+
+    public void ejemploZipWithRangos() {
+        Flux<Integer> rangos = Flux.range(0,4);
+
+        Flux.just(1,2,3,4)
+                .map(i -> (i*2))
+                .zipWith(rangos, (uno, dos) -> String.format("Primer Flux: %d, Segundo Flux: %d", uno, dos))
+                .subscribe(texto -> log.info(texto));
     }
 }
